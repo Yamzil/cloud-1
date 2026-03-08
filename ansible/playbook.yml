@@ -1,0 +1,6 @@
+---
+- name: Deploy cloud-vms-1
+  hosts: cloud-vms-1
+  become: true
+  roles:
+    - docker
