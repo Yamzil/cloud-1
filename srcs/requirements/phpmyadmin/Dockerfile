@@ -12,10 +12,13 @@ RUN apt-get update && \
         unzip && \
     rm -rf /var/lib/apt/lists/*
 
-RUN wget -q https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.zip \
+RUN mkdir -p /var/www/phpmyadmin
+
+RUN wget https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.zip \
         -O /tmp/phpmyadmin.zip && \
-    unzip -q /tmp/phpmyadmin.zip -d /tmp/ && \
-    mv /tmp/phpMyAdmin-5.2.1-all-languages /var/www/phpmyadmin && \
+    unzip /tmp/phpmyadmin.zip -d /tmp/ && \
+    mv /tmp/phpMyAdmin-5.2.1-all-languages/* /var/www/phpmyadmin/ && \
+    rm -rf /tmp/phpMyAdmin-5.2.1-all-languages && \
     rm /tmp/phpmyadmin.zip
 
 COPY conf/config.inc.php /var/www/phpmyadmin/config.inc.php

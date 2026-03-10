@@ -1,0 +1,100 @@
+---
+- name: Create WordPress data directory
+  file:
+    path: /home/yamzil/data/wp
+    state: directory
+    mode: '0755'
+    recurse: yes
+
+- name: Create MariaDB data directory
+  file:
+    path: /home/yamzil/data/db
+    state: directory
+    mode: '0755'
+    recurse: yes
+
+- name: Create project directory
+  file:
+    path: /root/cloud-1
+    state: directory
+    mode: '0755'
+
+- name: Copy srcs directory to server
+  copy:
+    src: ../srcs/
+    dest: /root/cloud-1/srcs/
+    mode: preserve
+
+- name: Explicity Copie .env file
+  copy:
+    src: ../srcs/.env
+    dest: /root/cloud-1/srcs/.env
+    mode: '0600'
+
+- name: Check .env file exists on server
+  stat:
+    path: /root/cloud-1/srcs/.env
+  register: env_file
+
+- name: Fail if .env is missing
+  fail:
+    msg: ".env file was not copied to the server. Check your local srcs/.env exists and is not gitignored from the copy."
+  when: not env_file.stat.exists
+
+- name: Ensure volume directories have correct permissions
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - /home/yamzil/data/wp
+    - /home/yamzil/data/db
+
+- name: Stop existing containers
+  shell: docker compose down
+  args:
+    chdir: /root/cloud-1/srcs
+  ignore_errors: true
+
+
+- name: Build and start containers
+  shell: docker compose build --no-cache && docker compose up -d
+  args:
+    chdir: /root/cloud-1/srcs
+  register: compose_output
+
+- name: Print compose output
+  debug:
+    msg: "{{ compose_output.stdout_lines }}"
+
+- name: Wait for services to initialize
+  pause:
+    seconds: 30
+    prompt: "Waiting for services to initialize..."
+
+- name: Check container status
+  shell: docker compose ps
+  args:
+    chdir: /root/cloud-1/srcs
+  register: container_status
+
+- name: Print container status
+  debug:
+    msg: "{{ container_status.stdout_lines }}"
+
+- name: Test NGINX is responding
+  shell: |
+    curl --insecure \
+         --silent \
+         --output /dev/null \
+         --write-out "%{http_code}" \
+         https://localhost:443
+  register: nginx_response
+  retries: 5
+  delay: 10
+  until: nginx_response.stdout != ""
+  ignore_errors: true
+
+- name: Print NGINX response code
+  debug:
+    msg: "NGINX HTTP response code: {{ nginx_response.stdout }}"
