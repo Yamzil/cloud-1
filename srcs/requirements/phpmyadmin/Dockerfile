@@ -12,18 +12,18 @@ RUN apt-get update && \
         unzip && \
     rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /var/www/phpmyadmin
+RUN mkdir -p /usr/src/phpmyadmin
 
 RUN wget https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.zip \
         -O /tmp/phpmyadmin.zip && \
     unzip /tmp/phpmyadmin.zip -d /tmp/ && \
-    mv /tmp/phpMyAdmin-5.2.1-all-languages/* /var/www/phpmyadmin/ && \
+    mv /tmp/phpMyAdmin-5.2.1-all-languages/* /usr/src/phpmyadmin/ && \
     rm -rf /tmp/phpMyAdmin-5.2.1-all-languages && \
     rm /tmp/phpmyadmin.zip
 
-COPY conf/config.inc.php /var/www/phpmyadmin/config.inc.php
+COPY conf/config.inc.php /usr/src/phpmyadmin/config.inc.php
 
-RUN chown -R www-data:www-data /var/www/phpmyadmin
+RUN chown -R www-data:www-data /usr/src/phpmyadmin
 
 COPY tools/start_pma.sh /usr/local/bin/start_pma.sh
 RUN chmod +x /usr/local/bin/start_pma.sh

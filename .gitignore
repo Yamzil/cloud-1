@@ -7,3 +7,14 @@ srcs/.env
 .DS_Store
 .env
 .vscode
+en.subject.pdf
+terraform/terraform.tfvars
+terraform/*.tfvars
+terraform.tfvars
+*.tfvars
+terraform/.terraform
+.terraform/
+terraform.tfvars
+*.tfvars
+terraform.tfstate
+terraform.tfstate.backup

@@ -26,6 +26,8 @@ services:
     build: ./requirements/phpmyadmin
     container_name: phpmyadmin
     env_file: .env
+    volumes:
+      - wp_data:/var/www/html
     networks:
       - cloud_network
     restart: unless-stopped

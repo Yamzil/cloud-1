@@ -3,7 +3,6 @@
 PHP_VERSION=$(php -r "echo PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;")
 echo "PHP version: $PHP_VERSION"
 
-# Listen on port 9000 instead of unix socket
 sed -i "s|listen = /run/php/php${PHP_VERSION}-fpm.sock|listen = 9000|" \
     /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf
 
@@ -18,7 +17,6 @@ if [ ! -f "$WP_DIR/wp-config.php" ]; then
         --allow-root \
         --path="$WP_DIR"
 
-    # Create wp-config.php first (doesn't require DB to be up)
     wp config create \
         --allow-root \
         --path="$WP_DIR" \
@@ -42,7 +40,6 @@ if [ ! -f "$WP_DIR/wp-config.php" ]; then
     done
     echo "MariaDB is ready."
 
-    # If WordPress is not installed yet (no DB tables), install it non-interactively
     if ! wp core is-installed --allow-root --path="$WP_DIR" >/dev/null 2>&1; then
         echo "Running non-interactive WordPress installation..."
         wp core install \
